@@ -81,40 +81,43 @@ CREATE TABLE owns (
     ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Repair jobs 
-CREATE TABLE repair_jobs (
-  partcode     INT AUTO_INCREMENT PRIMARY KEY,
-  job_date     DATE NOT NULL,
-  duration_min INT CHECK (duration_min >= 0),
-  cost         DECIMAL(10,2) CHECK (cost >= 0),
-  customer_cpr VARCHAR(20) NOT NULL,
-  bike_id      INT NOT NULL,
-  KEY idx_rj_customer (customer_cpr),
-  KEY idx_rj_bike (bike_id),
-  CONSTRAINT fk_rj_customer_cpr
-    FOREIGN KEY (customer_cpr) REFERENCES customers(cpr_number)
-    ON UPDATE CASCADE ON DELETE RESTRICT,
-  CONSTRAINT fk_rj_bike_id
-    FOREIGN KEY (bike_id) REFERENCES bikes(bike_id)
-    ON UPDATE CASCADE ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 -- Parts used in a repair 
 CREATE TABLE repair_job_parts (
-  partcode           INT NOT NULL,
+  listid             INT NOT NULL,
   manufacturer_name  VARCHAR(255) NOT NULL,
   part_code          VARCHAR(40)  NOT NULL,
   qty                INT NOT NULL CHECK (qty > 0),
-  PRIMARY KEY (partcode, manufacturer_name, part_code),
+  PRIMARY KEY (listid),
   KEY idx_rjp_part (manufacturer_name, part_code),
-  CONSTRAINT fk_rjp_repair
-    FOREIGN KEY (partcode) REFERENCES repair_jobs(partcode)
-    ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT fk_rjp_part
     FOREIGN KEY (manufacturer_name, part_code)
     REFERENCES parts(manufacturer_name, part_code)
     ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Repair jobs 
+CREATE TABLE repair_jobs (
+  job_date     DATE NOT NULL,
+  duration_min INT CHECK (duration_min >= 0),
+  cost         DECIMAL(10,2) CHECK (cost >= 0),
+  customer_cpr VARCHAR(20) NOT NULL,
+  bike_id      INT NOT NULL,
+  parts_list_id INT,
+  KEY idx_rj_customer (customer_cpr),
+  KEY idx_rj_bike (bike_id),
+  PRIMARY KEY (job_date, customer_cpr, bike_id),
+  CONSTRAINT fk_rj_customer_cpr
+    FOREIGN KEY (customer_cpr) REFERENCES customers(cpr_number)
+    ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT fk_rj_bike_id
+    FOREIGN KEY (bike_id) REFERENCES bikes(bike_id)
+    ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT fk_rj_parts_list_id
+	FOREIGN KEY (parts_list_id) REFERENCES repair_job_parts(listid)
+    ON UPDATE CASCADE ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
 
 -- Compatibility (parts that fit bikes)
 CREATE TABLE compatible_parts (
@@ -176,8 +179,19 @@ VALUES
   ('011175-9012', 006),
   ('150600-3456', 007);
 
+INSERT INTO repair_job_parts (listid, manufacturer_name, part_code, qty)
+VALUES
+  (001, 'Trek',      'P001', 2),
+  (002, 'Avenue',    'P002', 1),
+  (003, 'Batavus',   'P003', 1),
+  (004, 'Kildemose', 'P004', 1),
+  (005, 'Shimano',   'P005', 3),
+  (006, 'Shimano',   'P006', 2),
+  (007, 'Giant',     'P007', 1);
+
+
 -- Use ISO dates and valid days
-INSERT INTO repair_jobs (job_date, duration_min, cost, customer_cpr, bike_id, partcode)
+INSERT INTO repair_jobs (job_date, duration_min, cost, customer_cpr, bike_id, parts_list_id)
 VALUES  
   ('2025-04-01',  90, 1450, '123456-7890', 001, 001),
   ('2025-06-30', 120, 1800, '234567-8901', 002, 002),  
@@ -185,6 +199,7 @@ VALUES
   ('2025-08-09', 180, 2547, '250388-5678', 004, 004),
   ('2025-07-25',  60,  780, '100795-1234', 005, 005),
   ('2025-10-03', 150, 1950, '011175-9012', 006, 006),
+  ('2025-10-30', 120, 2000, '234567-8901', 002, 002),  
   ('2025-11-03',  90, 1120, '150600-3456', 007, 007);
 
 INSERT INTO compatible_parts (bike_id, manufacturer_name, part_code)
