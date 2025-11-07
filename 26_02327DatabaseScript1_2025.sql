@@ -18,7 +18,7 @@ create table bikes (
 			foreign key (manufacturer_name) references manufacturers (manufacturer_name)
             on update cascade
             on delete restrict
-);
+);  
 
 create table parts (
 	manufacturer_name varchar(255) not null,
@@ -115,6 +115,7 @@ insert into manufacturers (manufacturer_name, country) values
 
 insert into bikes(bike_code, bike_type, speeds, weight_kg, wheel_diameter, manufacturer_name) values
 (101, 'Mountain', 21, 13.5, 27.5, 'Trek'),
+(106, 'Mountain', 21, 13.5, 29.5, 'Trek'),
 (102, 'Road', 18, 9.8, 28.0, 'Giant'),
 (103, 'Hybrid', 7, 12.3, 28.0, 'Specialized'),
 (104, 'Electric', 10, 22.0, 29.0, 'Trek'),
@@ -134,7 +135,6 @@ insert into compatible_parts(bike_code, manufacturer_name, part_code) values
 (101, 'SRAM', 'SR01'),
 (102, 'Shimano', 'S002'),
 (102, 'SRAM', 'SR02'),
-(103, 'Giant', 'G001'),
 (103, 'Specialized', 'SP01'),
 (104, 'Trek', 'T001'),
 (104, 'SRAM', 'SR02'),
@@ -159,7 +159,12 @@ insert into repair_jobs (bike_code, job_datetime, customer_cpr, duration_min, co
 (102, '2024-04-05 14:00:00', '222222-2222', 60, 275.00),
 (103, '2025-01-20 11:15:00', '333333-3333', 75, 180.00),
 (104, '2024-09-12 16:45:00', '111111-1111', 120, 500.00),
-(105, '2025-05-22 13:10:00', '444444-4444', 30, 90.00);
+(105, '2025-05-22 13:10:00', '444444-4444', 30, 90.00),
+(106, '2025-05-15 10:00:00', '111111-1111', 45, 200.00),
+(106, '2025-04-15 10:00:00', '111111-1111', 45, 200.00),
+(106, '2025-06-15 10:00:00', '111111-1111', 45, 200.00);
+
+-- We will search for the corresponding parts in the repair_job_parts, a repair job is unique because of its bike and job_datetime 
 
 insert into repair_job_parts (bike_code, job_datetime, manufacturer_name, part_code, quantity) values
 (101, '2024-02-10 09:30:00', 'Shimano', 'S001', 2),
