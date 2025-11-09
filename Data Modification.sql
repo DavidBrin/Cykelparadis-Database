@@ -1,41 +1,58 @@
--- Insert a new customer
-INSERT Customer VALUES ('1230450697', 'testdummy@hotmail.com', '+45 99 23 44 02', 'Tester Dumminus');
+USE bikeshop;
 
--- Insert a new Bike
-INSERT Bike VALUES ('B008', 'Mountin', '3', '6.5', '26');
+INSERT INTO customers VALUES ('555555-5555', 'Watson Smith', 'Bellevue Esplanade', 'Aarhus', '7700', '66778899', 'smith@gmail.com');
 
--- Insert a new Repair Job
-INSERT Repair Jobs VALUES ('1/12/2026', '2', '1500', '1230450697', 'B008', 'P008', '5');
+INSERT INTO bikes VALUES (106, 'Gravel', 11, 10.2, 28.0, 'Specialized');
 
--- Insert new Parts Used for the Repair Job
-INSERT Parts Used VALUES ('P008', 'P108'),
-                         ('P008', 'P103'),
-                         ('P008', 'P102'),
-                         ('P008', 'P109'),
-                         ('P008', 'P101');
+INSERT INTO owns VALUES ('555555-5555', 106, '2025-02-10');
 
--- Insert a new Part
-INSERT Parts VALUES ('P108', 'Front Basket', '200', 'Kildemose');
+INSERT INTO parts VALUES ('Specialized', 'SP02', 'Gravel Tyre', 65.00);
 
-INSERT Owns VALUES ('1230450697', 'B008');
+INSERT INTO compatible_parts VALUES (106, 'Specialized', 'SP02');
 
-INSERT Compatible VALUES ('P108', 'B008');
+INSERT INTO repair_jobs VALUES (106,  '2025-03-03 12:00:00', '555555-5555', 45, 150.00);
 
--- Update the customer's email address
-UPDATE Customer 
-SET email = 'tester.dumminus@gmail.com' 
-WHERE customer_id = '1230450697';
+INSERT INTO repair_job_parts VALUES (
+    106,
+    '2025-03-03 12:00:00',    
+    'Specialized',             
+    'SP02',              
+    2 	                   
+);
 
--- Update the repair job cost
-UPDATE Repair_Jobs 
-SET cost = '1650' 
-WHERE repair_id = 'P008';
+INSERT INTO manufacturers (manufacturer_name, country) 
+VALUES 
+('Ritchey', 'USA');
 
--- Update the part price
-UPDATE Parts 
-SET price = '225' 
-WHERE part_id = 'P108';
+INSERT INTO parts (manufacturer_name, part_code, part_description, unit_price) 
+VALUES 
+('Ritchey', 'RCH-01', 'Carbon Seatpost', 110.00);
 
--- Delete the part 
-DELETE FROM Parts 
-WHERE part_id = 'P108';
+INSERT INTO compatible_parts VALUES (101, 'Ritchey', 'RCH-01');
+
+UPDATE parts SET unit_price = 50.00 WHERE 
+manufacturer_name = 'SRAM' AND part_code = 'SR01';
+
+UPDATE customers SET street = 'New Street 15',
+city = 'Copenhagen', postal_code = '7000', phone = '11223344' WHERE
+cpr_number = '111111-1111'
+; 
+
+UPDATE parts SET unit_price = unit_price * 1.15
+WHERE manufacturer_name = 'Shimano';
+
+UPDATE repair_jobs SET job_datetime = '2025-03-16 10:00:00'
+WHERE bike_code = 101 AND job_datetime = '2025-03-15 10:00:00';
+    
+SET SQL_SAFE_UPDATES = 0;
+UPDATE repair_jobs rj JOIN bikes b ON 
+rj.bike_code = b.bike_code
+SET rj.cost = rj.cost + 10.00 WHERE b.bike_type = 'Electric';
+SET SQL_SAFE_UPDATES = 1;
+
+DELETE FROM repair_jobs
+WHERE bike_code = 105 AND job_datetime = '2025-05-22 13:10:00';
+
+DELETE FROM parts
+WHERE manufacturer_name = 'Specialized' AND part_code = 'SP01';
+
