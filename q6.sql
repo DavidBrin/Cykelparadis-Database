@@ -25,8 +25,7 @@ JOIN repair_jobs
     AND repair_jobs.job_datetime = repair_job_parts.job_datetime
 WHERE YEAR(repair_jobs.job_datetime) = 2024
 GROUP BY part_code, manufacturer_name;
--- Reasoning: We first join the parts table and repair_job_parts table and repair_jobs table, this allows to get the job_date from repair_jobs
--- While we can get the quantity of the parts from repair_jobs_parts table
+-- Reasoning: We first join the parts table and repair_job_parts table and repair_jobs table, this allows to get the job_datetime from repair_jobs, while we can get the quantity of the parts from joining on the repair_jobs_parts table
 -- 
 
 // Query 4
@@ -58,8 +57,6 @@ WHERE bikes.bike_code NOT IN (
 	SELECT bike_code
     FROM compatible_parts
 )
--- Reasoning: We look for bike ids which 1. do not have any bike manufacturer being different from the compatible parts manufacturer, as if there
--- is at least 1 compatible part with a different manufacturer, it should not be returned
--- 2. we also ensure that only bike_ids which have any compatible parts are returned, which is the reason for the 2nd condition
+-- Reasoning: We look for bike ids which 1. do not have any bike manufacturer being different from the compatible parts manufacturer, as if there is at least 1 compatible part with a different manufacturer, it should not be returned 2. we also ensure that only bike_ids which have any compatible parts are returned, which is the reason for the 2nd condition
 
 
