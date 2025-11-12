@@ -93,7 +93,7 @@ END//
 DELIMITER ;
 
 
-// Query 1
+-- Query 1
 SELECT cpr_number 
 FROM customers 
 WHERE cpr_number IN (
@@ -103,7 +103,7 @@ WHERE cpr_number IN (
     HAVING COUNT(*) > 1
 );
 
-// Query 2
+-- Query 2
 SELECT parts.part_code, parts.manufacturer_name 
 FROM parts 
 LEFT JOIN repair_job_parts
@@ -111,7 +111,7 @@ LEFT JOIN repair_job_parts
 WHERE repair_job_parts.part_code IS NULL;
 -- Reasoning: We join the parts with the repair_job_parts table, on their common part_code, and the rows with a null repair_job_parts.part_code means it is unused
 
-// Query 3
+-- Query 3
 SELECT part_code, manufacturer_name, repair_job_parts.quantity as total_quantity
 FROM parts
 NATURAL LEFT JOIN repair_job_parts
@@ -124,8 +124,8 @@ GROUP BY part_code, manufacturer_name;
 -- While we can get the quantity of the parts from repair_jobs_parts table
 -- 
 
-// Query 4
-// Count repairs per bikes
+-- Query 4
+-- Count repairs per bikes
 
 SELECT bike_type, bike_code, manufacturer_name FROM
 (
@@ -141,7 +141,7 @@ WHERE row_no = 1;
 -- by the number of repairs
 -- We then only select the top row from each partition
 
-// Query 5
+-- Query 5
 SELECT DISTINCT bikes.bike_code, bikes.manufacturer_name 
 FROM bikes
 WHERE bikes.bike_code NOT IN (
@@ -152,7 +152,7 @@ WHERE bikes.bike_code NOT IN (
 ) AND bikes.bike_code IN (
 	SELECT bike_code
     FROM compatible_parts
-)
+);
 -- Reasoning: We look for bike ids which 1. do not have any bike manufacturer being different from the compatible parts manufacturer, as if there
 -- is at least 1 compatible part with a different manufacturer, it should not be returned
 -- 2. we also ensure that only bike_ids which have any compatible parts are returned, which is the reason for the 2nd condition
@@ -160,8 +160,9 @@ WHERE bikes.bike_code NOT IN (
 
 
 SELECT * FROM repair_jobs;
-INSERT INTO repair_jobs (bike_code, job_datetime, customer_cpr, duration_min, cost)
-VALUES (102, '2025-11-11 10:00:00', '222222-2222', 5000, 500.00);
+-- Commented those lines since execution will lead to an error
+-- INSERT INTO repair_jobs (bike_code, job_datetime, customer_cpr, duration_min, cost)
+-- VALUES (102, '2025-11-11 10:00:00', '222222-2222', 5000, 500.00);
 
 INSERT INTO repair_jobs (bike_code, job_datetime, customer_cpr, duration_min, cost)
 VALUES (102, '2025-11-11 10:00:00', '222222-2222', 50, 500.00);
