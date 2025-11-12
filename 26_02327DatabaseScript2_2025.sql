@@ -84,7 +84,7 @@ DELIMITER //
 CREATE TRIGGER add_repair_job BEFORE INSERT ON repair_jobs
 FOR EACH ROW
 BEGIN
-	IF NEW.duration_min >= 4320 OR NEW.cost > 100000 THEN
+	IF NEW.duration_min > 4320 OR NEW.cost > 100000 THEN
 		SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = "Error: Repair job cannot exceed 72 hours or 100000 DKK";
 	END IF;
