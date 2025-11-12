@@ -112,7 +112,7 @@ WHERE repair_job_parts.part_code IS NULL;
 -- Reasoning: We join the parts with the repair_job_parts table, on their common part_code, and the rows with a null repair_job_parts.part_code means it is unused
 
 -- Query 3
-SELECT part_code, manufacturer_name, repair_job_parts.quantity as total_quantity
+SELECT part_code, manufacturer_name, SUM(repair_job_parts.quantity) as total_quantity
 FROM parts
 NATURAL LEFT JOIN repair_job_parts
 JOIN repair_jobs
@@ -132,7 +132,7 @@ SELECT bike_type, bike_code, manufacturer_name FROM
     SELECT bikes.bike_type, bikes.bike_code, bikes.manufacturer_name, Count(bikes_repaired.bike_code) as number_of_repairs,
 ROW_NUMBER() OVER (PARTITION BY bikes.bike_type ORDER BY Count(bikes_repaired.bike_code) DESC) as row_no
 FROM bikes 
-NATURAL LEFT JOIN repair_jobs bikes_repaired
+ LEFT JOIN repair_jobs bikes_repaired
 GROUP BY bikes.bike_code, bikes.bike_type, bikes.manufacturer_name
 ) ranked_by_repairs
 WHERE row_no = 1;
@@ -166,8 +166,6 @@ SELECT * FROM repair_jobs;
 
 INSERT INTO repair_jobs (bike_code, job_datetime, customer_cpr, duration_min, cost)
 VALUES (102, '2025-11-11 10:00:00', '222222-2222', 50, 500.00);
-
-SELECT * FROM repair_jobs;
 
 INSERT INTO customers VALUES ('555555-5555', 'Watson Smith', 'Bellevue Esplanade', 'Aarhus', '7700', '66778899', 'smith@gmail.com');
 
